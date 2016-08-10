@@ -1,8 +1,15 @@
 package com.raymondcqk.filetest;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.ImageView;
+
+import com.raymondqk.filetest.R;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -312,21 +319,108 @@ public class MyFileUtil {
      * 读取目录下子目录及文件列表
      */
     public static String[] getExternalDirs(String dir) {
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/" + dir);
-        if (file.exists()){
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + dir);
+        if (file.exists()) {
             String[] dirs = null;
             if (file.isDirectory()) {
+                Log.i(TEST, dir + " 目录正确");
                 dirs = file.list();
                 return dirs;
             } else if (file.isFile()) {
-                Log.i(MyFileUtil.TEST, "该目录为文件");
+                Log.i(TEST, dir + " 为文件");
                 return null;
             }
-        }else {
-            Log.i(TEST,"dir no exists");
+        } else {
+            Log.i(TEST, dir + " 不存在");
             return null;
         }
         return null;
     }
 
+    /**
+     * 读取Raw 文本文件
+     */
+    public static String readRawText(Context context, int resId) {
+        InputStream is = context.getResources().openRawResource(resId);
+        if (is == null) {
+            Log.i(TEST, "该资源文件不存在");
+            return null;
+        }
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is));
+        String line = "";
+        StringBuilder builder = new StringBuilder();
+        try {
+            while ((line = bufferedReader.readLine()) != null) {
+                builder.append(line + "\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return builder.toString();
+    }
+
+    /**
+     * 读取Raw目录的媒体文件，返回AssetFileDescriptor
+     *
+     * @param context
+     * @param resId
+     * @return AssetFileDescriptor
+     */
+    public static AssetFileDescriptor readRawMedia(Context context, int resId) {
+        /**
+         * 读取Raw音频文件
+         */
+        AssetFileDescriptor afd = context.getResources().openRawResourceFd(resId);
+        return afd;
+    }
+
+    /**
+     * 获取Asset目录下的媒体文件，返回AssetFileDescriptor
+     *
+     * @param context
+     * @param resId
+     * @return
+     */
+    public static AssetFileDescriptor readAssetMedia(Context context, String filename) {
+
+        try {
+            return context.getAssets().openFd(filename);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    /**
+     * 根据文件名将Asset目录下的图片转换为bitmap
+     *
+     * @param context
+     * @param filename
+     * @return
+     */
+    public static Bitmap readAssetPic(Context context, String filename) {
+
+        try {
+            InputStream in = context.getAssets().open(filename);
+            Bitmap bitmap = BitmapFactory.decodeStream(in);
+            return bitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.w(TEST, "文件读取失败");
+            return null;
+        }
+    }
+
+    public static String[] assetList(Context context, String dir) {
+        try {
+            String[] list = context.getAssets().list(dir);
+            return list;
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.w(TEST, "目录读取失败");
+            return null;
+        }
+
+    }
 }
