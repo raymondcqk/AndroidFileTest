@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
@@ -136,7 +137,7 @@ public class MyFileUtil {
         try {
             fis = new FileInputStream(file);
             reader = new BufferedReader(new InputStreamReader(fis));
-            if ((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null) {
                 builder.append(line);
             }
         } catch (FileNotFoundException e) {
@@ -247,6 +248,7 @@ public class MyFileUtil {
 
     /**
      * 读取外置存储器中应用程序目录文件
+     *
      * @param context
      * @param dir
      * @param filename
@@ -262,7 +264,7 @@ public class MyFileUtil {
             try {
                 FileInputStream in = new FileInputStream(file);
                 reader = new BufferedReader(new InputStreamReader(in));
-                if ((line = reader.readLine()) != null) {
+                while ((line = reader.readLine()) != null) {
                     builder.append(line);
                 }
             } catch (FileNotFoundException e) {
@@ -281,4 +283,50 @@ public class MyFileUtil {
         }
         return builder.toString();
     }
+
+    /**
+     * Assets：读取文本
+     */
+    public static String readAssetText(Context context, String filemane) {
+        InputStream in = null;
+        BufferedReader reader = null;
+        StringBuilder builder = new StringBuilder();
+        try {
+            in = context.getAssets().open(filemane);
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                builder.append(line + "\n");
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TEST, "can not find file: " + filemane);
+
+        }
+        return builder.toString();
+    }
+
+    /**
+     * 列出外置存储器文件列表
+     * 读取目录下子目录及文件列表
+     */
+    public static String[] getExternalDirs(String dir) {
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/" + dir);
+        if (file.exists()){
+            String[] dirs = null;
+            if (file.isDirectory()) {
+                dirs = file.list();
+                return dirs;
+            } else if (file.isFile()) {
+                Log.i(MyFileUtil.TEST, "该目录为文件");
+                return null;
+            }
+        }else {
+            Log.i(TEST,"dir no exists");
+            return null;
+        }
+        return null;
+    }
+
 }
