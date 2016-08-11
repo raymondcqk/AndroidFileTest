@@ -18,7 +18,6 @@ public class TestActivity extends Activity {
         WebView webView = (WebView) findViewById(R.id.webview);
         webView.loadUrl("file:///android_asset/main.html");
 
-
         //        String s = MyFileUtil.readAssetText(this,"main.html");
 
         //        String dir = "huawei/ime";
@@ -64,9 +63,5 @@ public class TestActivity extends Activity {
 //                Log.i(MyFileUtil.TEST, "目录为空");
 //            }
 //        }
-
-
     }
-
-
 }
